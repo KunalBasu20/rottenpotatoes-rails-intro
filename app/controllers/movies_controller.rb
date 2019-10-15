@@ -14,19 +14,41 @@ class MoviesController < ApplicationController
     @movies = Movie.all
     @all_ratings = ['G','PG','PG-13','R']
 
+    if params[:sort].nil? && params[:ratings].nil? && session[:sort].nil? && session[:ratings].nil?
+      return @movies
+    end
+
+    if params[:sort].nil? && params[:ratings].nil? && (!session[:sort].nil? || !session[:ratings].nil?)
+      redirect_to movies_path(:sort => session[:sort], :ratings => session[:ratings])
+    end
+    
     @ratings_selected = params[:ratings]
-    unless @ratings_selected.nil?
-      @movies = @movies.where(rating: @ratings_selected.keys) 
+    if !@ratings_selected.nil?
+      session[:ratings] = @ratings_selected
+      @movies = @movies.where(rating: @ratings_selected.keys)
+
+    elsif !session[:ratings].nil?
+      @movies = @movies.where(rating: session[:ratings].keys)
     end
 
     
     @sort = params[:sort]
-    if @sort == "title"
-      @movies = @movies.order("title ASC")
+    if !@sort.nil?
+      session[:sort] = @sort
+      if @sort == "title"
+        @movies = @movies.order("title ASC")
+  
+      elsif @sort == "release_date"
+        @movies = @movies.order("release_date ASC")
+      end
 
-    elsif @sort == "release_date"
-      @movies = @movies.order("release_date ASC")
+    elsif !session[:sort].nil?
+      @temp = session[:sort]
+      @movies = @movies.order("#{@temp} ASC")
     end
+
+    # IF sort and ratings are both empty in params, then need to use sessions
+
 
 
 

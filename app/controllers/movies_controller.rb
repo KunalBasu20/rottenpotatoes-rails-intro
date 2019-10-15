@@ -17,10 +17,6 @@ class MoviesController < ApplicationController
     if params[:sort].nil? && params[:ratings].nil? && session[:sort].nil? && session[:ratings].nil?
       return @movies
     end
-
-    if params[:sort].nil? && params[:ratings].nil? && (!session[:sort].nil? || !session[:ratings].nil?)
-      redirect_to movies_path(:sort => session[:sort], :ratings => session[:ratings])
-    end
     
     @ratings_selected = params[:ratings]
     if !@ratings_selected.nil?
